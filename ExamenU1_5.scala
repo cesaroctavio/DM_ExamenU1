@@ -8,7 +8,7 @@ val df = spark.read.option("header", "true").option("inferSchema","true")csv("Ne
 //3. y 4.////////////////////////////////////////
 df.printSchema()
 //5.///////////////////////////////////////
-df.show(5)
+df.columns
 
 df.select($"Date", $"Open", $"High", $"Low", $"Close").show()
 //6.///////////////////////////////////////////
@@ -25,17 +25,28 @@ df.select(max("High"), max("Date")).show()
 
 df2.select(df2("Hv Ratio").as("HV"), df("Date")).show()
 //9.//////////////////////////////////////////////////
-df.describe("Close").show()
+df.select(mean("Close")).show() //El close tiene proposito de desplagar los cierres de ventas en Netflix_2011_2016
 //10.///////////////////////////////////////////////
 df.select(max("Volume"), min("Volume")).show()
 //11.////////////////////////////////////////////
-//a.
+//a./////////
 println(s"Dias de cierre son: = ${ df.filter($"Close" < 600).count() }")
-//b.
+//b.//////////
 df.select($"High" > 500).count()
-//c.
+//c.////////
 df2.select(corr("High", "Volume")).show()
-//d.
+//d./////////
 df.select(max("Date")).show()
-//e.
+
+val dfyear = df.withColumn("Year",year(df("Date")))
+val maxyear = dfyear.select($"Year",$"High").groupBy("Year").max()
+val res = maxyear.select($"Year",$"max(High)")
+
+res.orderBy("Year").show()
+//e///////////.
 df.select(avg("Date")).show
+
+val  = df.withColumn("Month",month(df("Date")))
+val monthavgs = monthdf.select($"Month",$"Close").groupBy("Month").mean()
+
+monthavgs.select($"Month",$"avg(Close)").orderBy("Month").show()
